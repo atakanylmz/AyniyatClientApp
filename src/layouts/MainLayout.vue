@@ -1,106 +1,56 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+  <div class="q-pa-md">
+    <q-toolbar class="bg-orange-9 text-white shadow-2 rounded-borders ">
+      <q-tabs v-model="tab" shrink>
+        <q-tab name="tab1" label="ZİMMET BAZLI LİSTE" />
+        <q-tab name="tab2" label="PERSONEL LİSTESİ" />
+      </q-tabs>
+  <q-space></q-space>
+    <q-avatar>
+      <img src="~assets/KgmLogo.png">
+     </q-avatar >
+     <q-toolbar-title>
+    AYNİYAT 
+   </q-toolbar-title> 
+  <q-space></q-space>
 
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+{{ aktifKullanici.adSoyad }}
+      <q-btn flat dense round icon="logout" @mouseover="showText = true" @mouseleave="showText = false" @click="logout()">
+          <div class="text-subtitle2 flex flex-center text-grey-8 bg-orange-1" v-show="showText">
+            ÇIKIŞ
+          </div>
+        </q-btn>
+      <!--
+        notice shrink property since we are placing it
+        as child of QToolbar
+      -->
+  
+    </q-toolbar>
+  </div>
 </template>
+<script>
 
-<script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import myMixin from 'src/stores/mixin.js'
 
-defineOptions({
-  name: 'MainLayout'
-})
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+export default {
+  mixins: [myMixin],
+  name: "MainLayout",
+  data() {
+    return {
 
-const leftDrawerOpen = ref(false)
+      //showText: false,
+    };
+  },
+  methods: {
 
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+    logout() {
+      localStorage.clear();
+      window.location.href = "#/";
+    },
+    
+  },
+  mounted() { },
+  created() { },
+};
 </script>
