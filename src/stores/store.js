@@ -12,6 +12,7 @@ export const useStore = defineStore('main', {
       const response = await api.get("acilirliste/SubeListesiGetir");
 
       this.subeler = response.data;
+      return this.subeler;
     },
     
   },

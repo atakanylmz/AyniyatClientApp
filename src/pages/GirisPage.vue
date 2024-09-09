@@ -13,7 +13,7 @@
               <q-input filled v-model="kullaniciObj.kullaniciAdi"
                 label="Kullanıcı Adı" lazy-rules :rules="[(val) => val!=null || 'Kullanıcı Adı Giriniz']" />
               <q-input type="password" filled v-model="kullaniciObj.parola" label="Kullanıcı Şifresi *" lazy-rules
-                :rules="[(val) => val!=null || 'Paroola Giriniz']" />
+                :rules="[(val) => val!=null || 'Parola Giriniz']" />
   
               <div align="center">
                 <q-btn type="reset" label="TEMİZLE" color="primary" flat class="q-ml-sm" v-close-popup />
@@ -39,8 +39,8 @@
       return {
       
         kullaniciObj: {
-        kullaniciAdi: null,
-        parola: null  
+        kullaniciAdi: "atakan.yilmaz",
+        parola: "a"  
         },
         submitted: false,
       };
