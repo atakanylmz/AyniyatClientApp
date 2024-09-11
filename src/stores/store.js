@@ -9,7 +9,7 @@ export const useStore = defineStore('main', {
     
     async fetchSubeler() {
       // API'den verileri alın, örneğin fetchBirimler adlı bir API çağrısı yapın
-      const response = await api.get("acilirliste/SubeListesiGetir");
+      const response = await api.get("acilirliste/subelistesigetir");
 
       this.subeler = response.data;
       return this.subeler;

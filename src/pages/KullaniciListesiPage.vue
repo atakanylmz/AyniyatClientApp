@@ -34,7 +34,7 @@
 
                                  <!-- şube listesi  -->
                                 <q-select filled class="col-12 q-pl-md" v-model="kullaniciObj.subeId" color="orange-9"
-                                  label="Şube Müdürlüğü" :options="subeler" option-value="id" option-label="text"
+                                  label="Şube Müdürlüğü" :options="subelerDD" option-value="id" option-label="text"
                                   emit-value map-options transition-show="jump-up" transition-hide="jump-up"
                                   lazy-rules :rules="[true]" />
 
@@ -69,19 +69,22 @@
                   </div>
               </div>
 
-              <div class="col-6 ">
+              <div class="col-4 ">
                 <!-- şube listesi  -->
                 <q-select filled class="col-3 q-pl-md" v-model="kriterObj.subeId" color="orange-9"
-                                  label="Şube Müdürlüğü" :options="subeler" option-value="id" option-label="text"
+                                  label="Şube Müdürlüğü" :options="subelerDD" option-value="id" option-label="text"
                                   emit-value map-options transition-show="jump-up" transition-hide="jump-up"
                                   lazy-rules :rules="[true]" clearable />
               </div>
-
+             
               <div class="col-2  q-pl-md ">
                   <q-input outlined bottom-slots v-model="kriterObj.araText" label="Arama">
                   </q-input>
               </div>
-
+              <div class="col-2 q-pl-md">
+                <q-toggle style="color: grey; text-align: left" class="col-6" v-model="kriterObj.aktifmi"
+                checked-icon="check" color="green" :label="(kriterObj.aktifmi)?'Aktif Kullanıcılar':'Pasif Kullanıcılar'" unchecked-icon="clear" /> 
+              </div>
               <div class="col-2">
                   <div class="q-pa-md">
                       <q-btn color="white" text-color="orange-9" @click="kullaniciListesiGetir()">
@@ -120,15 +123,19 @@
       <q-dialog v-model="pop_ayniyat" persistent transition-show="scale" transition-hide="scale">
           <q-card class="bg-white text-orange-9" style="max-width: 1400px; width: 1400px">
               <q-card-section>
-                  <div class="text-h6">{{ pop_baslik }} </div>
+                  <div class="row">
+                    <div class="text-h6 col-6">{{ pop_baslik }} </div>  <div class="text-h6 col-6" align="right">{{kullaniciSatirVeri.adSoyad}}</div> 
+                  </div>
                   <hr style="background-color: #008080; border-style: none; height: 1px" />
+                
               </q-card-section>
               <q-card-section class="q-pt-none">
                   <div class="q-pa-md" style="max-width: 1400px">
                      
-
+                    
     <!-- AYNİYAT-->
       <div class="q-pa-md">
+
           <div class="row q-ml-sm">
 
               <div class="col-2">
@@ -146,7 +153,7 @@
                   </div>
               </div>
 
-             <div class="col-3 "></div>
+             <div class="col-1 "></div>
 
              <!-- tarih arama kriteri -->
               <div class="col-3">
@@ -196,6 +203,11 @@
               </div>
 
               <div class="col-2">
+              <q-toggle style="color: grey; text-align: left" class="q-pa-md" v-model="zimmetAraKriter.kaldirilanlariGoster"
+              checked-icon="check" color="green" :label="(zimmetAraKriter.kaldirilanlariGoster)?'Kaldırılanları Göster':'Kaldırılanları Gösterme'" unchecked-icon="clear" /> 
+              </div>
+              
+              <div class="col-2">
                   <div class="q-pa-md">
                       <q-btn color="white" text-color="orange-9" @click="ayniyatListesiGetir()">
                           <q-icon name="search" font-weight="300" />&nbsp;ARA
@@ -211,13 +223,24 @@
               row-key="id" flat bordered>
               <template v-slot:body-cell-action="props">
                   <q-td :props="props">
-                      <q-btn icon="brush" title="Düzenle" @click="ayniyatGuncellePopupAc(props.row)" flat></q-btn>
+                      <q-btn title="Düzenle" @click="ayniyatGuncellePopupAc(props.row)" flat>
+                        <q-icon size="2em" name="brush" color="teal" />
+
+                      </q-btn>
                       <q-btn
                           @click="ayniyatGecmisPopupAc(props.row)"
                           title="Geçmiş İşlemleri Gör"
-                          icon="history"
                           flat
                         >
+                        <q-icon size="2em" name="history" color="brown 2" />
+
+                        </q-btn>
+                        <q-btn
+                          @click="ayniyatKaldirPopupAc(props.row)"
+                          title="SİL"
+                          flat
+                        >
+                          <q-icon size="2em" name="delete" color="red" />
                         </q-btn>
                     </q-td>
               </template>
@@ -318,6 +341,48 @@
           </q-card>
       </q-dialog>
 
+
+       <!--AYNİYAT SİL POP UP-->
+    <q-dialog
+      v-model="pop_ayniyatkaldir"
+      persistent
+      transition-show="scale"
+      transition-hide="scale"
+    >
+      <q-card
+        class="bg-white text-orange-9"
+        style="max-width: 512px; width: 512px"
+      >
+        <q-card-section>
+          <div class="text-h6">Ayniyat kaldırılsın mı?</div>
+          <hr
+            style="background-color: #008080; border-style: none; height: 1px"
+          />
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <div class="q-pa-md" style="max-width: 512px">
+            <q-form @submit="ayniyatKaldir()" @reset="ayniyatObjeTemizle()">
+              <div class="row">
+                <!-- <q-select filled class="col-3" v-model="obj.kgmBirimId" color="orange-9" label="Teftiş Edilen KGM Birimi *" :options="unvanTips" option-value="id" option-label="ad" emit-value map-options transition-show="jump-up" transition-hide="jump-up" lazy-rules :rules="[ val => val || 'Unvan boş olmamalıdır!']" /> -->
+              </div>
+
+              <div align="right">
+                <q-btn
+                  label="Vazgeç"
+                  type="reset"
+                  color="orange-9"
+                  flat
+                  class="q-ml-sm"
+                  v-close-popup
+                />
+                <q-btn label="KALDIR" type="submit" color="orange-9" />
+              </div>
+            </q-form>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
   </div>
 </template>
 
@@ -339,7 +404,8 @@ export default {
           zimmetAraKriter:{
             kullaniciId:0,
             subeId:0,
-            tarih:new Date()
+            tarih:new Date(),
+            kaldirilanlariGoster:false
           },
           kullaniciSatirVeri:{
               id: 0,
@@ -347,6 +413,8 @@ export default {
             },
           pop_ayniyat:false,
           pop_ayniyatkayit:false,
+          pop_ayniyatkaldir:false,
+
           kullaniciObj: {
               // Sayfada eklemesi güncellemesi yapılan Obje
               id: 0,
@@ -372,7 +440,8 @@ export default {
           },
           kriterObj:{
             araText:null,
-            subeId:null
+            subeId:null,
+            aktifmi:true
           },
           kullaniciList: [], // Sayfada yönetilen Asıl tipin listesi (Bu Sayfada Ön Talep Listesi)
           ayniyatList:[],
@@ -533,6 +602,38 @@ export default {
       }
   },
   methods: {
+    ayniyatIndir(){
+        api.get("zimmet/excelindir/" + this.kullaniciSatirVeri.id, {
+            responseType: "blob",
+          })
+          .then((resp) => {
+            var a = window.document.createElement("a");
+            a.href = window.URL.createObjectURL(resp.data);
+            a.download = "Ayniyat.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
+    },
+    ayniyatKaldirPopupAc(satirVeri) {
+    
+      this.pop_ayniyatkaldir = true;
+      this.ayniyatObj.id = satirVeri.id;
+      
+    },
+    ayniyatKaldir() {
+      api.get("zimmet/kaldir/" + this.ayniyatObj.id).then((resp) => {
+        this.pop_ayniyatkaldir=false;
+        this.ayniyatListesiGetir();
+        this.$q.notify({
+              color: "green-4",
+              textColor: "white",
+              icon: "check",
+              message: "Kaldırma işlemi başarılı",
+          });
+          });
+    },
+
       kullaniciListesiGetir() {
           var path = "kullanici/listeGetir";
           api.post(path, this.kriterObj)
@@ -569,7 +670,11 @@ export default {
         this.ayniyatObjeTemizle();
       },
       ayniyatGuncellePopupAc(satirVerisi){
-
+        api.get("zimmet/getir/" + satirVerisi.id).then((resp) => {
+            this.ayniyatObj=resp.data;
+              this.pop_ayniyatkayit = true;
+              this.pop_baslik = "Kayıt Güncelle";
+          });
       },
       kullaniciEklePopupAc() {
           this.pop_kayit = true;
@@ -584,11 +689,12 @@ export default {
           });
       },
       ayniyatPopupAc(satirVerisi){
-        this.pop_baslik="AYNİYAT GEÇİCİ ALINDISI"
 
         this.zimmetAraKriter.kullaniciId=satirVerisi.id;
         this.kullaniciSatirVeri.id=satirVerisi.id;
         this.kullaniciSatirVeri.adSoyad=satirVerisi.ad+" "+satirVerisi.soyad;
+        this.pop_baslik="AYNİYAT GEÇİCİ ALINDISI"
+
         this.zimmetAraKriter.tarih=new Date()
       //  this.zimmetAraKriter.tarih=new Date((new Date().setHours(0)));
         console.log(this.zimmetAraKriter.tarih)
